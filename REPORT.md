@@ -1,11 +1,8 @@
 # Scaffold Counting Test Task: Draft Report
 
-**Status: draft. Ground truth and detector results are filled in. Detector labels were not hand-corrected (see section 5). CPU inference time is still to be measured.**
-
 ## 1. Task interpretation
-The test images (file names: スチールプランク, "steel plank") show stacks of galvanized steel scaffold planks seen from their end faces, not tubes. I therefore count **planks (layers) per front stack**. Far-background and heavily occluded stacks are excluded.
+The test images  show stacks of galvanized steel scaffold planks seen from their end faces, not tubes. I therefore count **planks (layers) per front stack**. Far-background and heavily occluded stacks are excluded.
 
-**Reference check.** The reference video shows two modes of the app: tubes counted as individual labelled items, and flat sheets counted by placing a vertical line across the stack (it reports 24 sheets for one stack). The planks here are the flat-stock case, so counting layers along a user-placed line over each stack matches the intended workflow. (This is taken from a text summary of the video, not from the video itself.)
 
 ## 2. Approach (no training data needed)
 Each stack's end face is selected as a region of interest (in the app this would be a user tap or a detector box). For each region:
@@ -65,7 +62,7 @@ The line improves image 1 (47 to 54) and gives an exact total on image 5, but ma
 | 5 | 60 | 65 | 61 | 61 | +1 |
 | **Mean absolute error** | | **3.6** | **5.0** | **8.4** | |
 
-Inference time for YOLOv8n on a Tesla T4 GPU: 11 to 15 ms per image at 800 px (after warm-up). Core ML export succeeded (`best.mlpackage`, 6.2 MB, NMS included); it has not been run on a device.
+Inference time for YOLOv8n on a Tesla T4 GPU: 11 to 15 ms per image at 800 px (after warm-up). On the Colab CPU (Intel Xeon @ 2.00 GHz, PyTorch, one photo at 800 px, median of 10 runs) it took 174.5 ms per image. Core ML export succeeded (`best.mlpackage`, 6.2 MB, NMS included); it has not been run on a device, so phone speed is unmeasured.
 
 **Confidence-threshold sensitivity (same held-out models, one threshold for all images).**
 
@@ -88,6 +85,24 @@ The default threshold of 0.25 was fixed before any results were seen. The sensit
 - The mAP values printed during training were computed on a training image, not on the held-out one, so they are not reported.
 
 **What would improve it (not done).** Correct the labels by hand (images 1 and 2 first), add more varied photos, tile the large images, and check the confidence threshold on image 3 as a sensitivity test (it was not tuned per image).
+
+## 5b. Why YOLO, in simple terms
+- **It counts by drawing a box on every plank end, then counting the boxes.** That is also how the reference app works for individual items.
+- **Five photos is not as little as it sounds.** The five photos show about 230 plank ends in total, so the network sees hundreds of examples of what a plank end looks like, not just five pictures.
+- **It starts smart.** YOLOv8n was already trained on millions of everyday photos, so it already knows edges, metal and rectangles. We only had to teach it one new thing: "this is a plank end".
+- **It is small and quick.** About 3 million numbers (6.2 MB). It took 11 to 15 ms per image on the Colab GPU, and it exported to a Core ML file for iPhone with one command.
+- **Other options were less suitable.** A network that guesses the total number straight from the whole photo would need far more photos. Bigger detectors would be slower on a phone with no clear gain here. The simple edge counter needs no training, and it was built as the yardstick YOLO had to beat.
+- **It was not the winner.** On our five photos YOLO was about as good as the simple edge counter, not better, and it needed a lower confidence setting to find thin planks.
+- **A possible problem (untested).** Planks in a stack are thin and their boxes overlap. The step that removes duplicate boxes may delete real neighbouring planks, which could explain the undercount on image 3. This was not tested.
+- **Licence note.** As far as I know, Ultralytics YOLOv8 is released under the AGPL-3.0 licence, with a separate paid licence for commercial use. Before putting it in a commercial app, check the current terms, or use a detector with a more permissive licence.
+
+## 5c. How the small amount of data was handled, in simple terms
+- **A pretrained model:** the network started from what it had already learned, instead of from zero.
+- **Augmentation:** every time a training photo was shown, it was randomly changed (zoomed, shifted, tilted a little, brighter or darker, mirrored, or stitched together with other photos), so the network saw many versions of the same few photos. Each photo was also shown 16 times per round so there were enough training steps.
+- **A fair test:** each photo was counted by a network that had never seen it (train on four, count the hidden fifth, repeat five times).
+- **A yardstick without training:** the edge-counting method needs no labels, and it showed how good the network really was.
+- **Cheap labelling:** first-draft boxes were generated automatically from the edge counter to avoid drawing every box by hand. **They were not corrected afterwards**, so the network partly learned the edge counter's mistakes. This is the biggest weakness of the data approach.
+- **Not tried (next steps):** cutting large photos into tiles, making fake stacks, collecting more photos, hand-correcting labels, and using the app's tap-to-correct feature to feed fixes back into training.
 
 ## 6. iOS plan
 - Export the trained detector with `coremltools` (or the Ultralytics Core ML export), FP16 or int8, with non-maximum suppression included in the model. Run it through the Vision framework.
