@@ -1,6 +1,6 @@
 # Counting steel scaffold planks in photos
 
-Test task for Ready to Bloom. Full write-up: [`REPORT.md`](REPORT.md).
+Test task for Ready to Bloom. Short plain-language report: [`REPORT.md`](REPORT.md). Long technical version: [`docs/REPORT_DETAILED.md`](docs/REPORT_DETAILED.md).
 
 ## In plain words
 - **The job:** look at a photo of stacked steel planks and say how many planks are in each stack.
@@ -20,7 +20,7 @@ Test task for Ready to Bloom. Full write-up: [`REPORT.md`](REPORT.md).
 | 5 | 60 | 65 | 61 | 61 | 61 |
 | **average miss** | | 3.6 | 5.0 | 8.4 | 3.2 |
 
-Read this honestly: the simple edge counter (Idea 1) is as good as the neural network, the clean photos (3, 4, 5) work and the angled or staggered ones (1, 2) do not, and the 0.15 column was chosen after seeing the results on the same five photos, so it is optimistic. The network was trained on box labels that were **not corrected by hand** (they came from Idea 2). Details, failures and the iPhone plan are in `REPORT.md`.
+Read this honestly: the simple edge counter (Idea 1) is as good as the neural network, the clean photos (3, 4, 5) work and the angled or staggered ones (1, 2) do not, and the 0.15 column was chosen after seeing the results on the same five photos, so it is optimistic. The network was trained on box labels that were **not hand-corrected** (they came from Idea 2). Details, failures and the iPhone plan are in `REPORT.md`.
 
 ## Run it
 ```bash
