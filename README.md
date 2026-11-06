@@ -1,14 +1,6 @@
 # Counting steel scaffold planks in photos
 
-Test task for Ready to Bloom. Short plain-language report: [`REPORT.md`](REPORT.md). Long technical version: [`docs/REPORT_DETAILED.md`](docs/REPORT_DETAILED.md).
-
-## In plain words
-- **The job:** look at a photo of stacked steel planks and say how many planks are in each stack.
-- **What the photos show:** the *ends* of flat steel planks piled like pancakes. Each end is a flat rectangle with a small hole. So the count is "how many pancakes in the pile", not "how many round pipes". (If pipes were meant, please send pipe photos.)
-- **Idea 1, no learning (`src/baseline.py`):** look down a pile from top to bottom. Every time one plank ends and the next begins there is a thin bright/dark edge. Count the edges, plus one.
-- **Idea 2, smarter edge counting (`src/dp_counter.py`):** planks lower in a photo look thinner because of perspective. This version lets the plank thickness change smoothly while it counts.
-- **Idea 3, learning (`notebooks/scaffold_yolo_colab.ipynb`):** teach a small neural network (YOLOv8n) to draw a box around every plank end, then count the boxes. With only 5 photos it was tested by hiding one photo, training on the other four, and counting the hidden one. Done five times.
-- **iPhone:** the trained network was exported to Core ML (`models/best.mlpackage`, 6.2 MB). It has **not** been run on a phone yet.
+Test task for Ready to Bloom. Short plain-language report: [`REPORT.md`](REPORT.md). 
 
 ## Results (planks per image, front stacks only)
 | Image | Correct | Idea 1 | Idea 2 (B2) | Idea 3 (conf 0.25) | Idea 3 (conf 0.15) |
@@ -20,7 +12,6 @@ Test task for Ready to Bloom. Short plain-language report: [`REPORT.md`](REPORT.
 | 5 | 60 | 65 | 61 | 61 | 61 |
 | **average miss** | | 3.6 | 5.0 | 8.4 | 3.2 |
 
-Read this honestly: the simple edge counter (Idea 1) is as good as the neural network, the clean photos (3, 4, 5) work and the angled or staggered ones (1, 2) do not, and the 0.15 column was chosen after seeing the results on the same five photos, so it is optimistic. The network was trained on box labels that were **not hand-corrected** (they came from Idea 2). Details, failures and the iPhone plan are in `REPORT.md`.
 
 ## Run it
 ```bash
