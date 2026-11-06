@@ -1,0 +1,6 @@
+# The test images are confidential: never commit them or anything that shows them.
+images/
+private_results/
+out_*.png
+*.zip
+__pycache__/
