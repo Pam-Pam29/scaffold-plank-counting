@@ -14,7 +14,7 @@ Code: `baseline.py` (A), `dp_counter.py` (B). Both run in about 3 to 6 ms (A) an
 
 ## 3. Results
 
-Ground truth is hand-counted from zoomed crops of the images, counted twice independently (once by the author, once as a check). "~" marks images where stacks are cropped or partly hidden, so the count is approximate. Counts are for the **front stacks only**. Image 1 is the least certain: the first count gave about 50, the check gave about 57, and the bottoms of the stacks are cropped by the frame.
+Ground truth is hand-counted from zoomed crops of the images, counted twice independently . "~" marks images where stacks are cropped or partly hidden, so the count is approximate. Counts are for the **front stacks only**. Image 1 is the least certain: the first count gave about 50, the check gave about 57, and the bottoms of the stacks are cropped by the frame.
 
 | Image | Correct count (front stacks) | A: peaks | B1: DP, loose | B2: DP, period-constrained | B3: DP, gradual |
 |---|---|---|---|---|---|
